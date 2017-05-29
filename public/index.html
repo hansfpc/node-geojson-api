@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Devs (GeoJSON)</title>
+    <link rel="stylesheet" href="./styles.css" type="text/css">
+    <link href="https://fonts.googleapis.com/css?family=Raleway" rel="stylesheet">
+    <script src="https://unpkg.com/react@latest/dist/react.js"></script>
+    <script src="https://unpkg.com/react-dom@latest/dist/react-dom.js"></script>
+    <script src="https://unpkg.com/babel-standalone@6.15.0/babel.min.js"></script>
+</head>
+<body>
+    <div id="homepage">
+        <h1>Hire a developer in your area!</h1>
+        <div id="devs">
+
+        </div>
+    </div>
+    <script type="text/babel">
+      var Devs = React.createClass({
+        getInitialState: function(){
+          return({
+            devs: []
+          });
+        },
+        render: function(){
+          var devs = this.state.devs;
+          devs = devs.map(function(dev, index){
+            return(
+                    <li key={index}>
+                        <span className={dev.obj.available}></span>
+                        <span className="name">{dev.obj.name}</span>
+                        <span className="rank">{dev.obj.age}</span>
+                        <span className="dist">{Math.floor(dev.dis / 1000)} km</span>
+                    </li>
+            );
+          });
+          return(
+                  <div id="dev-container">
+                      <form id="search" onSubmit={this.handleSubmit}>
+                          <label>Enter your Latitude:</label>
+                          <input type="text" ref="lat" placeholder="latitude" required />
+                          <label>Enter your Longitude:</label>
+                          <input type="text" ref="lng" placeholder="longitude" required />
+                          <input type="submit" value="Find Developers" />
+                      </form>
+                      <ul>{ devs }</ul>
+                  </div>
+          );
+        },
+        handleSubmit: function(e){
+          e.preventDefault();
+          var lng = this.refs.lng.value;
+          var lat = this.refs.lat.value;
+          fetch('/api/devs?lng=' + lng + '&lat=' + lat).then(function(data){
+            return data.json();
+          }).then( json => {
+            this.setState({
+              devs: json
+            });
+            console.log(json);
+          });
+        }
+      });
+      ReactDOM.render(
+        <Devs />,
+        document.getElementById('devs')
+      );
+    </script>
+</body>
+</html>
